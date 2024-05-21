@@ -1,0 +1,9 @@
+# data
+InitialAIG/
+lib/
+project_data/
+project_data2/
+
+# environment
+yosys/
+abc_py/
