@@ -1,5 +1,10 @@
 import os
 
+'''
+读了一个state，然后用ABC跑一个action，然后保存新的state
+
+'''
+
 state = 'alu2_0130622'
 circuitName, actions = state.split('_')
 circuitPath = './InitialAIG/train/' + circuitName + '.aig'

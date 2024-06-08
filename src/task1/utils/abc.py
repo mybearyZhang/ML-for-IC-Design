@@ -8,7 +8,7 @@ _abc = abcPy.AbcInterface()
 _abc.start()
 
 # 读取电路状态文件
-state = 'alu2_0130622'
+state = 'alu2_0130622.aig'
 _abc.read(state)
 
 # 初始化数据字典

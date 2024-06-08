@@ -3,7 +3,17 @@ InitialAIG/
 lib/
 project_data/
 project_data2/
+*.pkl
+*.log
+cache_task1/
 
 # environment
 yosys/
 abc_py/
+abc/
+cmake_example/
+python_example/
+
+# pycache
+**/__pycache__/
+*.history
