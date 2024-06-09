@@ -3,35 +3,36 @@ import numpy as np
 import torch
 import abc_py as abcPy
 import os
-import re
+from tqdm import tqdm
 
 def get_feature(state):
-    # 初始化 ABC 接口
+    """
+    从给定的电路状态文件中提取特征信息。
+    
+    参数:
+    state (str): 电路状态文件的路径。
+    
+    返回:
+    dict: 包含节点类型、反向前驱数量和边信息的字典。
+    """
     _abc = abcPy.AbcInterface()
     _abc.start()
-
-    # 读取电路状态文件
     _abc.read(state)
-
-    # 初始化数据字典
-    data = {}
-
-    # 获取节点数
-    numNodes = _abc.numNodes()
-
-    # 初始化数据数组
-    data['node_type'] = np.zeros(numNodes, dtype=int)
-    data['num_inverted_predecessors'] = np.zeros(numNodes, dtype=int)
+    
+    data = {
+        'node_type': np.zeros(_abc.numNodes(), dtype=int),
+        'num_inverted_predecessors': np.zeros(_abc.numNodes(), dtype=int),
+        'edge_index': [],
+        'nodes': _abc.numNodes()
+    }
+    
     edge_src_index = []
     edge_target_index = []
 
-    # 遍历每个节点并填充数据
-    for nodeIdx in range(numNodes):
+    for nodeIdx in range(_abc.numNodes()):
         aigNode = _abc.aigNode(nodeIdx)
         nodeType = aigNode.nodeType()
-        data['num_inverted_predecessors'][nodeIdx] = 0
-
-        # 确定节点类型
+        
         if nodeType == 0 or nodeType == 2:
             data['node_type'][nodeIdx] = 0
         elif nodeType == 1:
@@ -39,37 +40,42 @@ def get_feature(state):
         else:
             data['node_type'][nodeIdx] = 2
 
-        # 检查是否有反向前驱
         if nodeType == 4:
             data['num_inverted_predecessors'][nodeIdx] = 1
-        if nodeType == 5:
+        elif nodeType == 5:
             data['num_inverted_predecessors'][nodeIdx] = 2
 
-        # 检查是否有fanin 0
         if aigNode.hasFanin0():
-            fanin = aigNode.fanin0()
             edge_src_index.append(nodeIdx)
-            edge_target_index.append(fanin)
-
-        # 检查是否有fanin 1
+            edge_target_index.append(aigNode.fanin0())
+        
         if aigNode.hasFanin1():
-            fanin = aigNode.fanin1()
             edge_src_index.append(nodeIdx)
-            edge_target_index.append(fanin)
+            edge_target_index.append(aigNode.fanin1())
 
-    # 将列表转换为torch张量并添加到数据字典中
     data['edge_index'] = torch.tensor([edge_src_index, edge_target_index], dtype=torch.long)
     data['node_type'] = torch.tensor(data['node_type'])
     data['num_inverted_predecessors'] = torch.tensor(data['num_inverted_predecessors'])
-    data['nodes'] = numNodes
+
     return data
 
 def write_aig(state):
-    if os.path.exists('./cache_task1/' + state + '.aig'):
-        return get_feature('./cache_task1/' + state + '.aig')
+    """
+    将给定状态的电路转换为 AIG 格式文件，并提取其特征信息。
     
-    libFile = './lib/7nm/7nm.lib'
-    synthesisOpToPosDic = {
+    参数:
+    state (str): 电路状态描述。
+    
+    返回:
+    dict: 包含节点类型、反向前驱数量和边信息的字典。
+    """
+    cache_path = f'./cache_task1/{state}.aig'
+    
+    if os.path.exists(cache_path):
+        return get_feature(cache_path)
+    
+    lib_file = './lib/7nm/7nm.lib'
+    synthesis_op_to_pos_dic = {
         0: "refactor",
         1: "refactor -z",
         2: "rewrite",
@@ -79,32 +85,68 @@ def write_aig(state):
         6: "balance"
     }
 
-    circuitName, actions = state.split('_')
-    circuitPath = './InitialAIG/train/' + circuitName + '.aig'
-    nextState = './cache_task1/' + state + '.aig'  # current AIG file
-    actionCmd = ''
-    if actions == '':
-        feature = get_feature(circuitPath)
-    else:
-        for action in actions:
-            actionCmd += synthesisOpToPosDic[int(action)] + ' ; '
-
-        abcRunCmd = (
-            './yosys/yosys-abc -c "read ' + circuitPath + ' ; ' +
-            actionCmd +
-            ' read_lib ' + libFile + ' ; write ' + nextState + '"'
-        )
-        os.system(abcRunCmd)
-
-        feature = get_feature(nextState)
-    return feature
+    circuit_name, actions = state.split('_')
+    circuit_path = f'./InitialAIG/train/{circuit_name}.aig'
+    next_state = f'./cache_task1/{state}.aig'
+    
+    if not actions:
+        return get_feature(circuit_path)
+    
+    action_cmd = ' ; '.join(synthesis_op_to_pos_dic[int(action)] for action in actions)
+    
+    abc_run_cmd = (
+        f'./yosys/yosys-abc -c "read {circuit_path} ; {action_cmd} ; '
+        f'read_lib {lib_file} ; write {next_state}"'
+    )
+    os.system(abc_run_cmd)
+    
+    return get_feature(next_state)
 
 def extract_feature_target(data):
+    """
+    从给定的数据中提取特征和目标值。
+    
+    参数:
+    data (dict): 包含输入状态和目标值的字典。
+    
+    返回:
+    tuple: 包含特征列表和目标张量的元组。
+    """
     inputs, targets = data['input'], data['target']
-    feature_list, target_tensor = [], torch.zeros(len(inputs))
-    for i in range(len(inputs)):
-        state = inputs[i]
-        feature_list.append(write_aig(state))
-        target_tensor[i] = (targets[i])
-        
+    feature_list = [write_aig(state) for state in inputs]
+    target_tensor = torch.tensor(targets, dtype=torch.float)
+
     return feature_list, target_tensor
+
+def process_data(sub_datas, train_ratio, key):
+    """
+    处理单个子数据集，提取特征和标签，并划分训练集和测试集。
+    
+    参数:
+    sub_datas (list): 子数据集。
+    train_ratio (float): 训练集占比。
+    key (str): 数据集名称。
+    
+    返回:
+    tuple: 包含训练特征、训练标签、测试特征和测试标签的元组。
+    """
+    train_features, train_labels = [], []
+    test_features, test_labels = [], []
+    
+    train_num = int(len(sub_datas) * train_ratio)
+    train_indices = np.random.choice(len(sub_datas), train_num, replace=False)
+    
+    for i, data in tqdm(enumerate(sub_datas)):
+        feature, label = extract_feature_target(data)
+        if i in train_indices:
+            train_features.append(feature)
+            train_labels.append(label)
+        else:
+            test_features.append(feature)
+            test_labels.append(label)
+    
+    output_path = f'data/task1/{key}.pkl'
+    with open(output_path, 'wb') as f:
+        pickle.dump((train_features, train_labels, test_features, test_labels), f)
+    
+    return train_features, train_labels, test_features, test_labels
