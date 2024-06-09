@@ -27,8 +27,14 @@ cd ML-for-IC-Design
 pip install -r requirements.txt
 ```
 
+Moreover, you need to install the `abc`, `abc_py`, `yosys` packages for logic synthesis. You can install it refer to the following repositories:
+
+- [abc](https://github.com/berkeley-abc/abc)
+- [abc_py](https://github.com/krzhu/abc_py)
+- [yosys](https://github.com/YosysHQ/yosys)
+
 ## Data Preparation
-Before running the tasks, ensure your datasets are properly prepared and located in the designated directories.
+Before running the tasks, ensure your datasets are properly prepared and located in the designated directories. Datas can be found at [https://jbox.sjtu.edu.cn/l/01O2vH](https://jbox.sjtu.edu.cn/l/01O2vH).
 
 You should have the following directory structure:
 
@@ -84,18 +90,18 @@ This task involves predicting the evaluation metrics of a logic synthesis proces
    python -m src.task1.train [arguments]
    ```
 
-Additional parameters can be specified to customize the training process:
+    Additional parameters can be specified to customize the training process:
 
-+ --**data_dir**: Directory containing the data files.
-+ --**max_train_samples**: Maximum number of training samples to load.
-+ --**batch_size**: Batch size for training and evaluation.
-+ --**num_workers**: Number of workers for data loading.
-+ --**hidden_channels**: Number of hidden channels in the GCN.
-+ --**learning_rate**: Learning rate for the optimizer.
-+ --**weight_decay**: Weight decay for the optimizer.
-+ --**num_epochs**: Number of epochs to train.
-+ --**best_model_path**: Path to save the best model.
-+ --**project_name**: Project name for wandb logging.
+    + --**data_dir**: Directory containing the data files.
+    + --**max_train_samples**: Maximum number of training samples to load.
+    + --**batch_size**: Batch size for training and evaluation.
+    + --**num_workers**: Number of workers for data loading.
+    + --**hidden_channels**: Number of hidden channels in the GCN.
+    + --**learning_rate**: Learning rate for the optimizer.
+    + --**weight_decay**: Weight decay for the optimizer.
+    + --**num_epochs**: Number of epochs to train.
+    + --**best_model_path**: Path to save the best model.
+    + --**project_name**: Project name for wandb logging.
 
 
 
