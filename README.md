@@ -131,14 +131,16 @@ In this task, we introduce the prompting process utilized for generating Verilog
 ### Naive Prompting
 Naive prompting involves providing task descriptions directly to LLMs to generate corresponding Verilog code. Prompts outline the task scope, granting LLMs creative freedom. Sample prompts include:
 
-> + **Row Multiplication**: Generate Verilog code for row multiplication.
-> + **Finite State Machine**: Create Verilog code for a finite state machine with more than 2 stages.
-> + **Memory Unit Design**: Develop Verilog code for a memory-like storage structure.
+> + **Row Multiplication**: Write a Verilog code that generates the results of row multiplication.
+> + **Finite State Machine**: Write a Verilog code of a finite state machine that encompasses more
+than 2 stages.
+> + **Memory Unit Design**: Write a Verilog code to generate a memory-like storage structure
 
 ### In Context Learning
 In Context Learning entails dynamic model adaptation based on task-specific context. Initial solutions, generated without parameter fine-tuning, are iteratively refined using original samples as prompts. The iterative refinement process involves:
 
-> + **First Prompting**: Initial Verilog code generation for row multiplication.
-> + **Second Prompting**: Refinement by altering matrix dimensions.
-> + **Third Prompting**: Further refinement by incorporating additional matrices.
-> + **Fourth Prompting**: Enhancement with error handling.
+> + **First Prompting**: Write a Verilog code that generates the results of row multiplication.
+> + **Second Prompting**: I have a generated row multiplication code as follows *{last-version-of-code}*, refine it by changing the dimension of matrix A and B into 5*5 
+> + **Third Prompting**: I have a generated row multiplication code as follows *{last-version-of-code}*, refine it by adding another matrix.
+> + **Fourth Prompting**: I have a generated row multiplication code as follows *{last-version-of-code}*, refine it by adding error handling to the original code.
+> + **Fifth Prompting**: I have a generated row multiplication code as follows *{last-version-of-code}*, refine it by adding test benches.
