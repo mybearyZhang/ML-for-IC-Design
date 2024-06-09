@@ -63,10 +63,8 @@ def train_BCQ(replay_buffer, num_actions, device, args, parameters):
         
         policy.save(f"./models/BCQ_{setting}_{training_iters}")
 
-        # Log metrics to wandb
         wandb.log({"Training Iterations": training_iters})
 
-    # Finish wandb run
     wandb.finish()
 
 

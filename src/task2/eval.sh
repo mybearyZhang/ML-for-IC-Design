@@ -1,7 +1,7 @@
 if [ "$1" = "greedy" ] || [ "$1" = "astar" ]; then
-    model_path="/root/"
+    model_path="/root/ML-for-IC-Design/models/best_model.pth"
 else
-    model_path="/root/ML-for-IC-Design/src/task2/bcq/models/BCQ_IC-Design_0_30000"
+    model_path="/root/ML-for-IC-Design/src/task2/bcq/models/BCQ_IC-Design_0_200000"
 fi
 aig_args=("alu4" "apex1" "apex2" "apex4" "b9" "bar" "c880" "c7552" "cavlc" "div" "i9" "m4" "max1024" "mem_ctrl" "pair" "prom1" "router" "sqrt" "square" "voter")
 

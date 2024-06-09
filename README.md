@@ -121,9 +121,37 @@ python -m src.task2.train_reward [arguments]
 
 The arguments are similar to Task 1, please refer to the previous section for more details.
 
-### Search for the best decision
-[TODO]
+### Train BCQ algorithm
 
+To train the BCQ algorithm, you need to generate a replay buffer first. Please run the following command (Ensure you have run `src.task1.read`):
+
+```bash
+python src/task2/gen_buffer.py
+```
+
+After you get the replay buffer, you can set the replay buffer path in `src/task2/bcq/train.py` and train the BCQ algorithm by running the following command:
+
+```bash
+cd src/task2/bcq
+python train.py
+```
+
+### Search for the best decision
+
+To search for the best decision, you can run the following command:
+
+```bash
+cd src/task2
+python main.py --aig AIG --model_path MODEL_PATH [--data_root DATA_ROOT] [--method {astar,greedy,rl}]
+```
+
+You can easily choose different search algorithms by passing the `--method` argument. The available methods are `astar`, `greedy`, and `rl`. `--aig` argument is the name of the aig file.
+
+If you want to evaluate on a series of AIGs, you can run the following script:
+
+```bash
+bash eval.sh [method]
+```
 
 ## Task 3: High level synthesis with large language model
 In this task, we introduce the prompting process utilized for generating Verilog code using Large Language Models (LLMs). Two prompting techniques are employed: naive prompting and in-context learning.

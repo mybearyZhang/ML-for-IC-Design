@@ -29,7 +29,6 @@ class GreedySolver:
                 generate_next_aig(self._state_to_aig(state), action, child_file)
                 heurs.append(self._heuristic(child_file))
             action = np.argmax(heurs)
-            print(np.max(heurs), self._baseline)
             state = state + str(action)
         
         adp = score_aig_adp(self._state_to_aig(state))

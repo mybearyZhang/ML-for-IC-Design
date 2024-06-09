@@ -14,7 +14,7 @@ class AStarSolver:
         self._device = device
         self._data_root = data_root
 
-    def solve(self, aig_name):
+    def solve(self, aig_name, max_search=100):
         self._aig_name = aig_name
         self._best_adp = float('inf')
         self._best_state = None
@@ -30,24 +30,24 @@ class AStarSolver:
         heapq.heappush(node_queue, Node(init_state, score_aig_adp(init_aig_file), self._heuristic(init_aig_file), None))
 
         while node_queue:
+            if max_search <= 0:
+                break
+
             cur_node = heapq.heappop(node_queue)
 
             if cur_node.cost < self._best_adp:
                 self._best_adp = cur_node.cost
                 self._best_state = cur_node.state
-            print(cur_node.state, self._best_adp, self._baseline)
 
             if tuple(cur_node.state) in self._visited_states:
                 continue
-            # optional pruning
-            # if cur_node.eval_cost > self._best_adp:
-            #     continue
 
             # finish searching
             if self._finish(cur_node.state):
                 continue
             
             self._visited_states.add(tuple(cur_node.state))
+            max_search -= 1
 
             # explore new nodes
             for node in self._explore(cur_node):

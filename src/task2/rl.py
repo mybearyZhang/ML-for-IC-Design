@@ -22,7 +22,7 @@ class RLSolver:
         os.makedirs(os.path.join(self._data_root, aig_name), exist_ok=True)
 
         state = f'{aig_name}_'
-        self._baseline = score_aig_baseline(self._state_to_aig(state))
+        self._baseline = score_aig_baseline(self._state_to_aig(state), logFile=f'{self._aig_name}.log')
         for _ in range(MAX_STEP):
             action = self._get_action(state)
             new_state = state + str(action)
