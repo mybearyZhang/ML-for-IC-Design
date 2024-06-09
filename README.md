@@ -81,10 +81,42 @@ This task involves predicting the evaluation metrics of a logic synthesis proces
    Execute the `train.py` script to train the model using the train set.
 
    ```bash
-   python -m src.task1.train
+   python -m src.task1.train [arguments]
    ```
 
+Additional parameters can be specified to customize the training process:
+
++ --**data_dir**: Directory containing the data files.
++ --**max_train_samples**: Maximum number of training samples to load.
++ --**batch_size**: Batch size for training and evaluation.
++ --**num_workers**: Number of workers for data loading.
++ --**hidden_channels**: Number of hidden channels in the GCN.
++ --**learning_rate**: Learning rate for the optimizer.
++ --**weight_decay**: Weight decay for the optimizer.
++ --**num_epochs**: Number of epochs to train.
++ --**best_model_path**: Path to save the best model.
++ --**project_name**: Project name for wandb logging.
+
+
+
 ## Task 2: Logic synthesis decision
+In this task, we aim to predict the logic synthesis decision based on the input AIGs. 
+
+### Predict future rewards
+First we train a GNN network to predict the future rewards of the logic synthesis process. The rewards are calculated based on the evaluation metrics of the AIGs.
+
+Similar to Task 1, we first read and cache the data, then split the data into train and test sets. Finally, we train the model to predict the future rewards. The execution commands are as follows:
+
+```bash
+python -m src.task2.read
+python -m src.task2.split
+python -m src.task2.train_reward [arguments]
+```
+
+The arguments are similar to Task 1, please refer to the previous section for more details.
+
+### Search for the best decision
+[TODO]
 
 
 ## Task 3: High level synthesis with large language model
@@ -93,14 +125,14 @@ In this task, we introduce the prompting process utilized for generating Verilog
 ### Naive Prompting
 Naive prompting involves providing task descriptions directly to LLMs to generate corresponding Verilog code. Prompts outline the task scope, granting LLMs creative freedom. Sample prompts include:
 
-> + Row Multiplication: Generate Verilog code for row multiplication.
-> + Finite State Machine: Create Verilog code for a finite state machine with more than 2 stages.
-> + Memory Unit Design: Develop Verilog code for a memory-like storage structure.
+> + **Row Multiplication**: Generate Verilog code for row multiplication.
+> + **Finite State Machine**: Create Verilog code for a finite state machine with more than 2 stages.
+> + **Memory Unit Design**: Develop Verilog code for a memory-like storage structure.
 
 ### In Context Learning
 In Context Learning entails dynamic model adaptation based on task-specific context. Initial solutions, generated without parameter fine-tuning, are iteratively refined using original samples as prompts. The iterative refinement process involves:
 
-> + First Prompting: Initial Verilog code generation for row multiplication.
-> + Second Prompting: Refinement by altering matrix dimensions.
-> + Third Prompting: Further refinement by incorporating additional matrices.
-> + Fourth Prompting: Enhancement with error handling.
+> + **First Prompting**: Initial Verilog code generation for row multiplication.
+> + **Second Prompting**: Refinement by altering matrix dimensions.
+> + **Third Prompting**: Further refinement by incorporating additional matrices.
+> + **Fourth Prompting**: Enhancement with error handling.
