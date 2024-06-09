@@ -1,7 +1,7 @@
 import pickle
 import numpy as np
 from tqdm import tqdm
-from utils.feature import extract_feature_target
+from ..utils.feature import extract_feature_target
 import concurrent.futures
 
 def load_data(file_path):

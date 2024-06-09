@@ -1,11 +1,9 @@
 import torch
 import pickle
-import numpy as np
 import torch.nn.functional as F
 from torch_geometric.data import Data, DataLoader
-from utils.model import GCN
+from ..utils.model import GCN
 from tqdm import tqdm
-from utils.feature import get_feature, write_aig, extract_feature_target
 import os
 from time import time
 import gc
@@ -17,8 +15,7 @@ def load_data(data_dir, max_train_samples=2500):
     graphs = []
     test_graphs = []
 
-    for file in os.listdir(data_dir)[:2]:
-        print(file)
+    for file in os.listdir(data_dir):
         if file.endswith('.pkl'):
             with open(os.path.join(data_dir, file), 'rb') as f:
                 key = file.split('.')[0]
@@ -83,6 +80,9 @@ def main(args):
     train_graphs, test_graphs = load_data(args.data_dir, args.max_train_samples)
     train_loader, test_loader = get_data_loaders(train_graphs, test_graphs, args.batch_size, args.num_workers)
     
+    del train_graphs, test_graphs
+    gc.collect()
+    
     model = GCN(num_node_features=2, hidden_channels=args.hidden_channels, num_output_features=1).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
 
@@ -115,7 +115,7 @@ if __name__ == '__main__':
     parser.add_argument('--learning_rate', type=float, default=1e-5, help='Learning rate for the optimizer.')
     parser.add_argument('--weight_decay', type=float, default=5e-8, help='Weight decay for the optimizer.')
     parser.add_argument('--num_epochs', type=int, default=200, help='Number of epochs to train.')
-    parser.add_argument('--best_model_path', type=str, default='best_model_task1_1e-6.pth', help='Path to save the best model.')
+    parser.add_argument('--best_model_path', type=str, default='best_model_task1.pth', help='Path to save the best model.')
     parser.add_argument('--project_name', type=str, default='GNN-IC-Design', help='Project name for wandb logging.')
     
     args = parser.parse_args()
