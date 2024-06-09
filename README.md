@@ -88,3 +88,19 @@ This task involves predicting the evaluation metrics of a logic synthesis proces
 
 
 ## Task 3: High level synthesis with large language model
+In this task, we introduce the prompting process utilized for generating Verilog code using Large Language Models (LLMs). Two prompting techniques are employed: naive prompting and in-context learning.
+
+### Naive Prompting
+Naive prompting involves providing task descriptions directly to LLMs to generate corresponding Verilog code. Prompts outline the task scope, granting LLMs creative freedom. Sample prompts include:
+
+> + Row Multiplication: Generate Verilog code for row multiplication.
+> + Finite State Machine: Create Verilog code for a finite state machine with more than 2 stages.
+> + Memory Unit Design: Develop Verilog code for a memory-like storage structure.
+
+### In Context Learning
+In Context Learning entails dynamic model adaptation based on task-specific context. Initial solutions, generated without parameter fine-tuning, are iteratively refined using original samples as prompts. The iterative refinement process involves:
+
+> + First Prompting: Initial Verilog code generation for row multiplication.
+> + Second Prompting: Refinement by altering matrix dimensions.
+> + Third Prompting: Further refinement by incorporating additional matrices.
+> + Fourth Prompting: Enhancement with error handling.
