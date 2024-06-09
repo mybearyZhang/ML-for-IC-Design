@@ -6,6 +6,8 @@ project_data2/
 *.pkl
 *.log
 cache_task1/
+*.aig
+buffer/
 
 # environment
 yosys/
@@ -14,6 +16,11 @@ abc/
 cmake_example/
 python_example/
 
-# pycache
+# cache
 **/__pycache__/
 *.history
+wandb/
+
+# checkpoints
+*.pth
+
